@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- 加载hibernate的核心配置文件 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+	</bean>
+	<!-- 配置事务平台管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- 开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- 配置User的Action -->
+	<bean id="userAction" class="com.crm_ssh01.web.action.UserAction" scope="prototype">
+		<property name="userService" ref="userService"/>
+	</bean>
+	<bean id="userService" class="com.crm_ssh01.service.UserServiceImpl">
+		<property name="userDao" ref="userDao"/>
+	</bean>
+	<bean id="userDao" class="com.crm_ssh01.dao.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	
+	<!-- 配置Customer的Action -->
+	<bean id="customerAction" class="com.crm_ssh01.web.action.CustomerAction" scope="prototype">
+		<property name="customerService" ref="customerService"/>
+	</bean>
+	<!-- 配置客户的Service -->
+	<bean id="customerService" class="com.crm_ssh01.service.CustomerServiceImpl">
+		<property name="customerDao" ref="customerDao"/>
+	</bean>
+	<bean id="customerDao" class="com.crm_ssh01.dao.CustomerDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置dict的Action-->
+	<bean id="dictAction" class="com.crm_ssh01.web.action.DictAction" scope="prototype">
+		<property name="dictService" ref="dictService"/>
+	</bean>
+	<bean id="dictService" class="com.crm_ssh01.service.DictServiceImpl">
+		<property name="dictDao" ref="dictDao"/>
+	</bean>
+	<bean id="dictDao" class="com.crm_ssh01.dao.DictDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 配置linkman -->
+	<bean id="linkmanAction" class="com.crm_ssh01.web.action.LinkmanAction" scope="prototype">
+		<property name="linkmanService" ref="linkmanService"/>
+	</bean>
+	<bean id="linkmanService" class="com.crm_ssh01.service.LinkmanServiceImpl">
+		<property name="linkmanDao" ref="linkmanDao"/>
+		<property name="customerDao" ref="customerDao"/>
+	</bean> 
+	<bean id="linkmanDao" class="com.crm_ssh01.dao.LinkmanDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 对于Visit,Totals开启注解扫描 -->
+	<context:component-scan base-package="com.crm_ssh01"/>
+</beans>
